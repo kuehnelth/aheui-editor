@@ -57,7 +57,7 @@ class AheuiEditor(AheuiEditorGen.Editor):
 
     def setchar(self):
         line = self.CodeCommand.GetStringSelection()[0] + self.CodeDirection.GetStringSelection()[0] + self.CodeNumber.GetStringSelection()[0]
-        self.CodeGrid.SetCellValue(self.selectionX, self.selectionY, self.jamo2syl(line))
+        self.CodeGrid.SetCellValue(self.selectionX, self.selectionY, self.jamo2syl(line).strip())
         return
 
     def importGrid(self, s):
