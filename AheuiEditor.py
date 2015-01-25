@@ -48,7 +48,7 @@ class AheuiEditor(AheuiEditorGen.Editor):
         self.selectionY = 0
 
         return
-    
+
     def jamo2syl(self, s):
         return unicodedata.normalize("NFC", s)
 
@@ -79,21 +79,21 @@ class AheuiEditor(AheuiEditorGen.Editor):
                 l += self.CodeGrid.GetCellValue(x,y) or " "
             s += l.rstrip() + "\n"
         return s
-    
+
     # Handlers for Editor events.
     def CodeDirectionOnChoice(self, event):
         self.setchar()
-    
+
     def CodeCommandOnChoice(self, event):
         self.setchar()
-    
+
     def CodeNumberOnChoice(self, event):
         self.setchar()
-    
+
     def GridWidthOnSpinCtrl(self, event):
         # TODO: Implement code_widthOnSpinCtrl
         pass
-    
+
     def GridWidthOnSpinCtrlText(self, event):
         cols = self.CodeGrid.GetNumberCols()
         newcols = self.GridWidth.GetValue()
@@ -101,7 +101,7 @@ class AheuiEditor(AheuiEditorGen.Editor):
             self.CodeGrid.InsertCols(cols, newcols - cols)
         elif newcols < cols:
             self.CodeGrid.DeleteCols(newcols, cols - newcols)
-    
+
     def GridHeightOnSpinCtrl(self, event):
         rows = self.CodeGrid.GetNumberRows()
         newrows = self.GridHeight.GetValue()
@@ -109,15 +109,15 @@ class AheuiEditor(AheuiEditorGen.Editor):
             self.CodeGrid.InsertRows(rows, newrows - rows)
         elif newrows < rows:
             self.CodeGrid.DeleteRows(newrows, rows - newrows)
-    
+
     def GridHeightOnSpinCtrlText(self, event):
         # TODO: Implement code_heightOnSpinCtrlText
         pass
-    
+
     def LoadFileOnButtonClick(self, event):
         dlg = wx.FileDialog(
             self, message="Choose a file",
-            defaultDir=os.getcwd(), 
+            defaultDir=os.getcwd(),
             defaultFile="",
             wildcard=wildcard,
             style=wx.OPEN | wx.CHANGE_DIR | wx.FD_FILE_MUST_EXIST
@@ -129,11 +129,11 @@ class AheuiEditor(AheuiEditorGen.Editor):
             f.close()
             self.importGrid(s)
         pass
-    
+
     def SaveFileOnButtonClick(self, event):
         dlg = wx.FileDialog(
             self, message="Choose a file",
-            defaultDir=os.getcwd(), 
+            defaultDir=os.getcwd(),
             defaultFile="",
             wildcard=wildcard,
             style=wx.SAVE | wx.CHANGE_DIR
@@ -171,8 +171,8 @@ class AheuiEditor(AheuiEditorGen.Editor):
                 self.CodeNumber.SetStringSelection(c)
         event.Skip()
         pass
-    
-    
+
+
 if __name__ == "__main__":
     app = wx.App()
     frame = AheuiEditor(None)
