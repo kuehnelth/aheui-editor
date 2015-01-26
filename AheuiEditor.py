@@ -20,7 +20,8 @@ import wx
 import AheuiEditorGen
 import unicodedata
 import codecs
-import EsotopeAheui
+#import EsotopeAheui
+import ajit
 
 wildcard = "Aheui Code (*.aheui)|*.aheui|" \
            "All files (*.*)|*.*"
@@ -148,12 +149,16 @@ class AheuiEditor(AheuiEditorGen.Editor):
         pass
 
     def ExecuteOnButtonClick(self, event):
-        data = self.exportGrid()
-        code = EsotopeAheui.AheuiCode(data)
-        io = EsotopeAheui.AheuiIO("utf-8")
-        interpreter = EsotopeAheui.AheuiInterpreter(code, io)
-        interpreter.execute()
-
+        code = self.exportGrid()
+        machine = ajit.Machine(ajit.parse(code))
+        machine.number_input = ajit.aheui_number_input
+        machine.character_input = ajit.aheui_character_input
+        machine.output = ajit.aheui_output
+        try:
+            machine.run()
+        except ajit.AheuiExit as e:
+            if e.code != 0:
+                print "Error %d" % e.code
         event.Skip()
 
     def CodeGridOnGridSelectCell(self, event):
