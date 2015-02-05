@@ -44,11 +44,64 @@ class AheuiEditor(AheuiEditorGen.Editor):
 
         self.CodeGrid.SetDefaultColSize(25, resizeExistingCols = True)
         self.CodeGrid.SetDefaultRowSize(25, resizeExistingRows = True)
+        self.CodeGrid.Bind(wx.grid.EVT_GRID_RANGE_SELECT, self.OnCodeGridSelectRange)
+        self.CodeGridSelection = None
 
         self.selectionX = 0
         self.selectionY = 0
 
+        self.clipboard = [[]]
+
+        shortcuts = [[wx.NewId(), self.onCtrlC, wx.ACCEL_CTRL,  ord('C')],
+                     [wx.NewId(), self.onCtrlV, wx.ACCEL_CTRL,  ord('V')],
+                     [wx.NewId(), self.onCtrlX, wx.ACCEL_CTRL,  ord('X')]]
+
+        for s in shortcuts:
+            self.Bind(wx.EVT_MENU, s[1], id=s[0])
+        accel_tbl = wx.AcceleratorTable([(s[2], s[3], s[0]) for s in shortcuts])
+        self.SetAcceleratorTable(accel_tbl)
+
         return
+
+    def onCtrlC(self, event):
+        self.onCtrlX(event, False)
+        return
+
+    def onCtrlV(self, event):
+        #TODO: Check if Grid is large enough to paste data
+        if not self.CodeGridSelection:
+            self.SetGridSelectionCursor()
+        cy = self.CodeGrid.GetGridCursorCol()
+        cx = self.CodeGrid.GetGridCursorRow()
+        for y in range(cy, cy + len(self.clipboard)):
+            for x in range(cx, cx + len(self.clipboard[0])):
+                self.CodeGrid.SetCellValue(x, y, self.clipboard[y - cy][x - cx])
+        return
+
+    def onCtrlX(self, event, cut=True):
+        clipboard = []
+        if not self.CodeGridSelection:
+            self.SetGridSelectionCursor()
+        for y in range(self.CodeGridSelection[0][1], self.CodeGridSelection[1][1] + 1):
+            row = []
+            for x in range(self.CodeGridSelection[0][0], self.CodeGridSelection[1][0] + 1):
+                row.append(self.CodeGrid.GetCellValue(x, y))
+                if cut:
+                    self.CodeGrid.SetCellValue(x, y, "")
+            clipboard.append(row)
+        self.clipboard = clipboard
+        return
+
+    def SetGridSelectionCursor(self):
+        self.CodeGridSelection = ((self.CodeGrid.GetGridCursorRow(), self.CodeGrid.GetGridCursorCol()),
+                                      (self.CodeGrid.GetGridCursorRow(), self.CodeGrid.GetGridCursorCol()))
+        return
+
+    def OnCodeGridSelectRange(self, event):
+        if event.Selecting():
+            self.CodeGridSelection = (event.GetTopLeftCoords(), event.GetBottomRightCoords())
+        else:
+            self.CodeGridSelection = None
 
     def jamo2syl(self, s):
         return unicodedata.normalize("NFC", s)
